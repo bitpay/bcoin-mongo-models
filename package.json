@@ -1,0 +1,22 @@
+{
+  "name": "bcoin-mongo-models",
+  "version": "1.0.0",
+  "description": "Mongodb models for Bcoin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tenthirtyone/bcoin-mongo-models.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tenthirtyone/bcoin-mongo-models/issues"
+  },
+  "homepage": "https://github.com/tenthirtyone/bcoin-mongo-models#readme",
+  "dependencies": {
+    "mongoose": "^4.13.2"
+  }
+}
