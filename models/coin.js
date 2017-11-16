@@ -17,6 +17,13 @@ const CoinSchema = new Schema({
   spentTxId: String
 });
 
+CoinSchema.set('toObject', {
+  transform: function(doc, ret) {
+    ret.id = ret._id;
+    delete ret._id
+  }
+});
+
 CoinSchema.index({ key: 1 });
 CoinSchema.index({ height: 1 });
 CoinSchema.index({ mintTxid: 1, mintIndex: 1 });
