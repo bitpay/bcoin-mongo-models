@@ -9,7 +9,7 @@ const WalletSchema = new Schema({
   },
   xpubkey: {
     type: Buffer,
-    required: true
+    required: false
   },
   coin: {
     type: String,
@@ -23,6 +23,14 @@ const WalletSchema = new Schema({
   _lastKnownDerivationIndex: {
     type: Number,
     default: 0,
+    required: false
+  },
+  _bip32version: {
+    type: Number,
+    required: false
+  },
+  _authPublicKey: {
+    type: String,
     required: true
   }
 });
@@ -32,6 +40,16 @@ WalletSchema.set('toObject', {
     ret.id = ret._id;
     delete ret._id
     delete ret._lastKnownDerivationIndex;
+    delete ret._bip32version;
+    delete ret._authPublicKey;
+  }
+});
+
+WalletSchema.virtual('isDeterministic', {
+  get: function() {
+    return typeof this.xpubkey !== 'undefined' &&
+      typeof this._lastKnownDerivationIndex !== 'undefined' &&
+      typeof this._bip32version !== 'undefined';
   }
 });
 
