@@ -11,10 +11,6 @@ const WalletSchema = new Schema({
     type: Buffer,
     required: false
   },
-  pubkeyhash: {
-    type: String,
-    required: true
-  },
   coin: {
     type: String,
     default: 'Bitcoin',
@@ -36,12 +32,17 @@ const WalletSchema = new Schema({
   _authPublicKey: {
     type: String,
     required: true
-  }
+  },
+  _publicKeyHash: {
+    type: String,
+    required: true
+  },
 });
 
 WalletSchema.set('toObject', {
   transform: function(doc, ret) {
-    ret.id = ret._id;
+    ret.id = ret._publicKeyHash;
+    delete ret._publicKeyHash;
     delete ret._id
     delete ret._lastKnownDerivationIndex;
     delete ret._bip32version;
