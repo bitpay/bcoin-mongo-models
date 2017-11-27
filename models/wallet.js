@@ -11,6 +11,10 @@ const WalletSchema = new Schema({
     type: Buffer,
     required: false
   },
+  pubkeyhash: {
+    type: String,
+    required: true
+  },
   coin: {
     type: String,
     default: 'Bitcoin',
