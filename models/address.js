@@ -41,14 +41,19 @@ AddressSchema.statics.removeAddress = function removeAddress(key) {
 AddressSchema.statics.getAddressesByHash160 = function getAddressesByHash160(hash) {
   return new Promise((res, rej) => {
     return this.model('Address').find({ addr: hash.toString('hex') },
-    (err, addrs) => {
-      if (err || !addrs || addrs.length === 0) {
-        return rej(err);
-      }
-      return res(addrs.map((addr) => {
-        return [addr.hash, addr.index];
-      }));
-    });
+      (err, addrs) => {
+        if (err) {
+          return rej(err);
+        }
+
+        if (!addrs || addrs.length === 0) {
+          return res(addrs);
+        } else {
+          return res(addrs.map((addr) => {
+            return [addr.hash, addr.index];
+          }));
+        }
+      });
   });
 };
 
