@@ -39,6 +39,8 @@ const WalletSchema = new Schema({
   },
 });
 
+WalletSchema.index({ _publicKeyHash: 1 });
+
 WalletSchema.set('toObject', {
   transform: function(doc, ret) {
     ret.id = ret._publicKeyHash;
