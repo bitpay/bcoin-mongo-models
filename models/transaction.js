@@ -26,7 +26,8 @@ const TransactionSchema = new Schema({
   mainChain:           Boolean,
   mempool:             Boolean,
   rawTx:               Buffer,
-  meta:                Buffer
+  meta:                Buffer,
+  raw:                 Buffer
 });
 
 TransactionSchema.index({ txid: 1 });
@@ -71,7 +72,8 @@ TransactionSchema.statics.saveBcoinTx = function saveBcoinTx(entry, tx, meta)  {
     network:             'main',
     mainChain:           true,
     mempool:             false,
-    meta:                meta.toRaw()
+    meta:                meta.toRaw(),
+    raw:                 tx.toRaw()
   });
   t.save((err) => {
     if (err) {

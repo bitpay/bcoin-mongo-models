@@ -1,6 +1,6 @@
 {
   "name": "bcoin-mongo-models",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mongodb models for Bcoin",
   "main": "index.js",
   "scripts": {
@@ -10,8 +10,8 @@
     "type": "git",
     "url": "git+https://github.com/tenthirtyone/bcoin-mongo-models.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Alex Sherbuck",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/tenthirtyone/bcoin-mongo-models/issues"
   },

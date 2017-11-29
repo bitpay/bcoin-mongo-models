@@ -122,7 +122,11 @@ BlockSchema.statics.getNextHash = function getNextHash(hash) {
         if (err || !block) {
           rej(err);
         }
-        res(block.nextBlockHash);
+        if (block === null) {
+          res(block);
+        } else {
+          res(block.nextBlockHash);
+        }
       }
     );
   });
