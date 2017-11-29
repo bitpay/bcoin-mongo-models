@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const WalletAddressSchema = new Schema({
-  wallet:  Schema.Types.ObjectId,
+  wallet:  String,
   address: String
 });
 
