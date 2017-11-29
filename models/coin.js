@@ -13,7 +13,7 @@ const CoinSchema = new Schema({
   coinbase:  Boolean,
   value:     Number,
   address:   String,
-  wallets:   {type: [Schema.Types.ObjectId]},
+  wallets:   String,
   spentTxId: String
 });
 
