@@ -10,17 +10,18 @@ const CoinSchema = new Schema({
   height:    Number,
   mintTxid:  String,
   mintIndex: Number,
+  script:    String,
   coinbase:  Boolean,
   value:     Number,
   address:   String,
-  wallets:   {type: [Schema.Types.ObjectId]},
+  wallets:   String,
   spentTxId: String
 });
 
 CoinSchema.set('toObject', {
   transform: function(doc, ret) {
     ret.id = ret._id;
-    delete ret._id
+    delete ret._id;
   }
 });
 
@@ -42,6 +43,7 @@ CoinSchema.statics.saveCoins = function saveCoins(key, data, coin, hash, index) 
     height:    coin.height,
     mintTxid:  hash,
     mintIndex: index,
+    script:    output.script,
     coinbase:  coin.coinbase,
     value:     output.value,
     address:   output.address
