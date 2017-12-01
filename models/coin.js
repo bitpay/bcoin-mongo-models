@@ -14,7 +14,7 @@ const CoinSchema = new Schema({
   coinbase:  Boolean,
   value:     Number,
   address:   String,
-  wallets:   String,
+  wallets:   [String],
   spentTxId: String
 });
 
