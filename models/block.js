@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Transaction = require('./transaction');
 const util = require('./util');
 
 const Schema = mongoose.Schema;
@@ -6,31 +7,31 @@ const Schema = mongoose.Schema;
 const MAX_BLOCKS = 100;
 
 const BlockSchema = new Schema({
-  network:           { type:  String, default:  '' },
-  mainChain:         { type:   Boolean, default: false },
-  height:            { type:  Number, default:  0 },
-  hash:              { type:  String, default:  '' },
-  version:           { type:  Number, default:  0 },
-  merkleRoot:        { type:  String, default:  '' },
-  time:              { type:  Date, default:    0 },
-  timeNormalized:    { type:  Date, default:    0 },
-  nonce:             { type:  Number, default:  0 },
-  previousBlockHash: { type:  String, default:  '' },
-  nextBlockHash:     { type:  Buffer, default:  '' },
-  transactionCount:  { type:  Number, default:  1},
-  size:              { type:  Number, default:  0 },
-  bits:              { type:  Number, default:  0 },
-  reward:            { type:  Number, default:  0 },
-  chainwork:         { type:  Number, default:  0 },
-  txs:               [{ type: String, default:  '' }],
-  poolInfo:          { type:  Object, default:  {} },
-  rawBlock:          { type:  Buffer, default:  '' }
+  network: { type: String, default: '' },
+  mainChain: { type: Boolean, default: false },
+  height: { type: Number, default: 0 },
+  hash: { type: String, default: '' },
+  version: { type: Number, default: 0 },
+  merkleRoot: { type: String, default: '' },
+  time: { type: Date, default: 0 },
+  timeNormalized: { type: Date, default: 0 },
+  nonce: { type: Number, default: 0 },
+  previousBlockHash: { type: String, default: '' },
+  nextBlockHash: { type: Buffer, default: '' },
+  transactionCount: { type: Number, default: 1 },
+  size: { type: Number, default: 0 },
+  bits: { type: Number, default: 0 },
+  reward: { type: Number, default: 0 },
+  chainwork: { type: Number, default: 0 },
+  txs: [Transaction],
+  poolInfo: { type: Object, default: {} },
+  rawBlock: { type: Buffer, default: '' }
 }, {
-  toJSON: {
-    virtuals: true
-  },
-  id: false
-});
+    toJSON: {
+      virtuals: true
+    },
+    id: false
+  });
 
 BlockSchema.index({ hash: 1 }, { unique: true });
 BlockSchema.index({ height: 1 });
@@ -74,7 +75,7 @@ BlockSchema.statics.getHeights = function getHeights(cb) {
     .sort({ height: 1 });
 };
 
-BlockSchema.statics.tipHash =  function tipHash(cb)  {
+BlockSchema.statics.tipHash = function tipHash(cb) {
   return this.last((err, block) => {
     if (err) {
       return cb(err);
@@ -93,10 +94,10 @@ BlockSchema.statics.getBlockHashByHeight = function getBlockHashByHeight(height)
     return this.model('Block').findOne(
       { height },
       { hash: 1 },
-        (err, block) => {
-          if (err) {
-            rej(err);
-          }
+      (err, block) => {
+        if (err) {
+          rej(err);
+        }
         return block === null ? res(block) : res(Buffer.from(block.hash, 'hex'));
       });
   });
@@ -104,7 +105,7 @@ BlockSchema.statics.getBlockHashByHeight = function getBlockHashByHeight(height)
 
 BlockSchema.statics.updateNextBlock = function updateNextBlock(hash, nextHash) {
   return this.model('Block').findOne(
-    {hash: hash},
+    { hash: hash },
     (err, block) => {
       if (!err && block) {
         block.nextBlockHash = nextHash;
@@ -133,32 +134,69 @@ BlockSchema.statics.getNextHash = function getNextHash(hash) {
 };
 
 BlockSchema.statics.saveBcoinBlock = function saveBcoinBlock(entry, block) {
-  const Block     = this.model('Block');
-  const rawBlock  = block.toRaw();
+  const Block = this.model('Block');
+  const rawBlock = block.toRaw();
   const blockJSON = block.toJSON();
-  const reward    = util.calcBlockReward(entry.height);
-
+  const reward = util.calcBlockReward(entry.height);
   return new Block({
-    mainChain:         true,
-    hash:              block.hash().toString('hex'),
-    height:            entry.height,
-    size:              block.getSize(),
-    version:           blockJSON.version,
+    mainChain: true,
+    hash: block.hash().toString('hex'),
+    height: entry.height,
+    size: block.getSize(),
+    version: blockJSON.version,
     previousBlockHash: blockJSON.prevBlock,
-    merkleRoot:        blockJSON.merkleRoot,
-    time:              blockJSON.time/1000,
-    timeNormalized:    blockJSON.time/1000,
-    bits:              blockJSON.bits,
-    nonce:             blockJSON.nonce,
-    transactionCount:  block.txs.length,
-    txs:               block.txs.map((tx) => {
+    merkleRoot: blockJSON.merkleRoot,
+    time: blockJSON.time / 1000,
+    timeNormalized: blockJSON.time / 1000,
+    bits: blockJSON.bits,
+    nonce: blockJSON.nonce,
+    transactionCount: block.txs.length,
+    txs: block.txs.map((tx) => {
       const txJSON = tx.toJSON();
-      return txJSON.hash;
+      return {
+        txid: txJSON.hash,
+        witnessHash: txJSON.witnessHash,
+        fee: txJSON.fee,
+        rate: txJSON.rate,
+        ps: txJSON.ps,
+        blockHeight: entry.height,
+        blockHash: entry.hash,
+        blockTime: entry.time / 1000,
+        blockTimeNormalized: entry.time / 1000,
+        index: txJSON.index,
+        version: txJSON.version,
+        flag: txJSON.flag,
+        inputs: tx.inputs.map((input) => {
+          const inputJSON = input.toJSON();
+          return {
+            prevout: inputJSON.prevout,
+            address: inputJSON.address,
+            script: inputJSON.script,
+            witness: inputJSON.witness,
+            sequence: inputJSON.sequence,
+            address: inputJSON.address,
+            coin: inputJSON.coin
+          };
+        }),
+        outputs: tx.outputs.map((output) => {
+          const outputJSON = output.toJSON();
+          return {
+            address: outputJSON.address,
+            value: outputJSON.value,
+            script: outputJSON.script
+          };
+        }),
+        lockTime: txJSON.locktime,
+        network: 'main',
+        mainChain: true,
+        mempool: false,
+        raw: tx.toRaw()
+      };
     }),
-    chainwork:         entry.chainwork,
+    chainwork: entry.chainwork,
     reward,
-    network:           'main',
-    poolInfo:          {},
+    network: 'main',
+    poolInfo: {},
     rawBlock
   }).save();
 };
