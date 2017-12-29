@@ -1,2 +1,5 @@
-# bcoin-mongo-models
-Mongodb models for Bcoin
+# DEPRECATED
+
+Deprecated in favor maintaining the models + api together;
+
+Please use: https://github.com/bitpay/bcoin-mongo-api
